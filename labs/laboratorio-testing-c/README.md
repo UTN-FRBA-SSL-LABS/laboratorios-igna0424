@@ -74,14 +74,14 @@ Vas a ver el carrito con tres productos y su total.
 
 **P1** — Calculá a mano el total esperado: Leche ($350 x2) + Pan ($200 x3) + Queso ($1500 x1).
 
-> R: (escribí el total esperado)
+> R:2800
 
 **P2** — ¿El total que imprime el programa coincide con lo que calculaste? Si no coincide, ¿cuánto muestra?
 
-> R:
+> R:NO
 
 ```
-TOTAL_PROGRAMA=
+TOTAL_PROGRAMA=2050
 ```
 _(escribí el número que imprimió el programa)_
 
@@ -131,7 +131,7 @@ Mirá el código en `tests/test_unitarios.c` para entender la estructura de un t
 
 **P3** — ¿Qué hace `carrito_init` y por qué es importante llamarla antes de usar el carrito?
 
-> R:
+> R:Inicializa el carrito sin productos para luego ir agregando dichos productos
 
 ---
 
@@ -166,10 +166,10 @@ make test_unitarios
 
 **P4** — ¿El nuevo test pasa o falla?
 
-> R:
+> R:El nuevo test pasa y funciona
 
 ```
-TEST_PRECIO_UNITARIO_PASA=
+TEST_PRECIO_UNITARIO_PASA=SI
 ```
 _(SI o NO)_
 
@@ -195,10 +195,10 @@ Descomentá `/* test_total_con_cantidad(); */` en el `main()`, compilá y corré
 
 **P5** — ¿Este test pasa o falla? ¿Qué valor esperaba y qué obtuvo?
 
-> R:
+> R:El test falla, porque espera 700 pero obtiene 350
 
 ```
-TEST_TOTAL_CANTIDAD_PASA=
+TEST_TOTAL_CANTIDAD_PASA=NO
 ```
 _(SI o NO)_
 
@@ -210,11 +210,11 @@ El test anterior encontró un bug en `carrito_total`. Abrí `src/carrito.c` y bu
 
 **P6** — ¿En qué línea está el bug y qué dice ese código?
 
-> R:
+> R:El bug esta en la linea 24. Lo que hace es sumar a total el precio de los productos
 
 **P7** — ¿Qué debería hacer esa línea para calcular el total correctamente?
 
-> R:
+> R:Deberia multiplicar los precios de los productos por la cantidad
 
 Corregí el bug. Luego volvé a compilar y correr:
 
@@ -232,7 +232,7 @@ cat salidas/test_unitarios.txt
 ```
 
 ```
-TESTS_UNITARIOS_PASAN=
+TESTS_UNITARIOS_PASAN=SI
 ```
 _(escribí SI si todos los tests pasan ahora)_
 
@@ -254,18 +254,18 @@ Descomentá `/* test_carrito_lleno(); */` en el `main()`, compilá y corré.
 
 **P8** — ¿El test pasa o falla? Si falla, ¿qué devuelve ese 5to `carrito_agregar`?
 
-> R:
+> R:El test falla, devuelve un 1 de exito mientras que lo esperado es un 0
 
 Si el test falló, encontraste el segundo bug. Buscá en `src/carrito.c` la condición del `if` dentro de `carrito_agregar`.
 
 **P9** — ¿Cuál es el operador incorrecto y cuál debería ser?
 
-> R:
+> R:El operador incorrecto es <= y deberia ser <
 
 Corregí el bug, volvé a compilar y verificá que todos los tests pasan.
 
 ```
-BUG_2_CORREGIDO=
+BUG_2_CORREGIDO=SI
 ```
 _(SI o NO)_
 
@@ -301,7 +301,7 @@ cat salidas/test_integracion.txt
 ```
 
 ```
-TEST_INTEGRACION_PASA=
+TEST_INTEGRACION_PASA=SI
 ```
 _(SI o NO)_
 
@@ -319,7 +319,7 @@ Escribí `test_agregar_hasta_llenar()` en el lugar `/* PARTE E */`. Este test de
 Descomentá `/* test_agregar_hasta_llenar(); */` en el `main()`, compilá y corré.
 
 ```
-TEST_LLENAR_PASA=
+TEST_LLENAR_PASA=SI
 ```
 _(SI o NO)_
 
@@ -338,10 +338,79 @@ Las líneas con `#####` nunca se ejecutaron — no están cubiertas por los test
 
 **P10** — ¿Hay alguna línea de `carrito.c` con `#####`? ¿Cuál y por qué no se ejecutó?
 
-> R:
+> R:Las lineas 29 y 30 donde se encuentra la funcion carrito_descuento. Esto pasa porque en los test unitarios no es usada la funcion carrito descuent
 
 ```
-COBERTURA_COMPLETA=
+COBERTURA_COMPLETA=COBERTURA_COMPLETA=gcc -Wall -Wextra -std=c99 --coverage -c src/carrito.c -o carrito.o
+gcc -Wall -Wextra -std=c99 --coverage -c tests/test_unitarios.c -o test_unitarios.o
+tests/test_unitarios.c:57:1: warning: return type defaults to ‘int’ [-Wimplicit-int]
+   57 | test_carrito_lleno() {
+      | ^~~~~~~~~~~~~~~~~~
+tests/test_unitarios.c: In function ‘test_carrito_lleno’:
+tests/test_unitarios.c:67:1: warning: control reaches end of non-void function [-Wreturn-type]
+   67 | }
+      | ^
+gcc --coverage carrito.o test_unitarios.o -o test_cobertura
+./test_cobertura
+=== Tests unitarios ===
+[carrito nuevo]
+  [OK]   carrito_contar(&c) == 0
+
+[agregar un producto]
+  [OK]   carrito_agregar(&c, p) == 1
+  [OK]   carrito_contar(&c) == 1
+
+[total: un producto, cantidad 1]
+  [OK]   carrito_total(&c) == 350
+
+[total: un producto, cantidad 2]
+  [OK]   carrito_total(&c) == 700
+
+[carrito lleno]
+  [OK]   resultado == 0
+
+--- 6/6 tests OK ---
+gcov -o . carrito.o
+File 'src/carrito.c'
+Lines executed:88.89% of 18
+Creating 'carrito.c.gcov'
+
+Lines executed:88.89% of 18
+        -:    0:Source:src/carrito.c
+        -:    0:Graph:./carrito.gcno
+        -:    0:Data:./carrito.gcda
+        -:    0:Runs:1
+        -:    1:#include "carrito.h"
+        -:    2:#include <string.h>
+        -:    3:
+        5:    4:void carrito_init(Carrito *c) {
+        5:    5:    c->cantidad = 0;
+        5:    6:}
+        -:    7:
+        8:    8:int carrito_agregar(Carrito *c, Producto p) {
+        8:    9:    if (c->cantidad < MAX_ITEMS) {   /* BUG: deberia ser < MAX_ITEMS */
+        7:   10:        c->items[c->cantidad] = p;
+        7:   11:        c->cantidad++;
+        7:   12:        return 1;
+        -:   13:    }
+        1:   14:    return 0;
+        -:   15:}
+        -:   16:
+        2:   17:int carrito_contar(Carrito *c) {
+        2:   18:    return c->cantidad;
+        -:   19:}
+        -:   20:
+        2:   21:int carrito_total(Carrito *c) {
+        2:   22:    int total = 0;
+        4:   23:    for (int i = 0; i < c->cantidad; i++) {
+        2:   24:        total += c->items[i].cantidad * c->items[i].precio;  /* BUG: falta multiplicar por cantidad */
+        -:   25:    }
+        2:   26:    return total;
+        -:   27:}
+        -:   28:
+    #####:   29:int carrito_descuento(int total, int porcentaje) {
+    #####:   30:    return total - (total * porcentaje / 100);
+        -:   31:}
 ```
 _(SI si todas las líneas están cubiertas, NO si hay alguna con #####)_
 
@@ -351,27 +420,27 @@ _(SI si todas las líneas están cubiertas, NO si hay alguna con #####)_
 
 **P11** — ¿Qué diferencia hay entre un test unitario y uno de integración? ¿Cuál de los dos detectó primero el bug de `carrito_total`?
 
-> R:
+> R:El test unitario evalua el resultados de funciones por separado, mientras que el de integracion utiliza todas las funciones y evalua con funciona en conjunto. El test unitario detecto primero el bug del carrito total.
 
 **P12** — El bug de capacidad en `carrito_agregar` causa un **buffer overflow**: se escribe más allá del array. ¿Por qué esto es peligroso en C pero no ocurriría en un lenguaje como Python o Java?
 
-> R:
+> R:Esto es peligroso porque al escribir mas alla del array estamos modificando memoria a la cual no sabemos como acceder, es decir, no tenemos un puntero a esa momoria a diferencia de los espacios del array.
 
 **P13** — En este laboratorio encontraste los bugs escribiendo tests. ¿Qué tiene de mejor este enfoque frente a mirar el código directamente?
 
-> R:
+> R:Mirar el código e intentar comprenderlo para encontrar el error puede ser abrumador y estresante, pero mediante estos tests ,si hay un error, nos indica donde se encuentra y el motivo por el cual se genero.
 
 **P14** — El test `test_total_precio_unitario` (cantidad = 1) **pasó** a pesar del bug, mientras que `test_total_con_cantidad` (cantidad = 2) **falló**. ¿Por qué el primer test no detectó el bug?
 
-> R:
+> R:Porque el test unitario evaluava el valor, mientras que el test total evaluava el total del precio por la cantidad de ese producto. El bug era que faltaba multiplicar la cantidad por el precio.
 
 ```
-BUG_EN_FUNCION_1=
+BUG_EN_FUNCION_1=carrito_agregar
 ```
 _(nombre de la función con el primer bug)_
 
 ```
-BUG_EN_FUNCION_2=
+BUG_EN_FUNCION_2=carrito_total
 ```
 _(nombre de la función con el segundo bug)_
 
@@ -381,12 +450,12 @@ _(nombre de la función con el segundo bug)_
 
 ### Checklist
 
-- [ ] Ambos bugs corregidos en `src/carrito.c`
-- [ ] Tests en `tests/test_unitarios.c` y `tests/test_integracion.c` completos y pasando
-- [ ] Salidas guardadas en `salidas/`
-- [ ] Respuestas y claves completadas en este archivo
-- [ ] `make test` pasa localmente
-- [ ] Todo pusheado a `main`
+- [X] Ambos bugs corregidos en `src/carrito.c`
+- [X] Tests en `tests/test_unitarios.c` y `tests/test_integracion.c` completos y pasando
+- [X] Salidas guardadas en `salidas/`
+- [X] Respuestas y claves completadas en este archivo
+- [X] `make test` pasa localmente
+- [X] Todo pusheado a `main`
 
 ### Verificación local
 
