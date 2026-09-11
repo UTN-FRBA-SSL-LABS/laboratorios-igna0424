@@ -219,7 +219,7 @@ Abrí `ejercicio1/Makefile` y completá los cuatro TODOs.
 #### TODO 1 — Definir la variable `CC`
 
 ```makefile
-CC :=
+CC := gcc
 ```
 
 `CC` es la variable estándar de Make para el **compilador de C**. Por convención
@@ -234,7 +234,7 @@ esta línea y todo el Makefile sigue funcionando sin tocar nada más.
 #### TODO 2 — Definir la variable `CFLAGS`
 
 ```makefile
-CFLAGS :=
+CFLAGS := -Wall
 ```
 
 `CFLAGS` (_C Flags_) contiene las opciones que le pasamos al compilador.
@@ -251,7 +251,7 @@ impiden la compilación, pero señalan código potencialmente problemático
 
 ```makefile
 $(PROGRAMA): suma.c
-	# Escribí el comando aquí
+	$(CC) $(CFLAGS) suma.c -o $(PROGRAMA)
 ```
 
 Este es el corazón del Makefile: el comando que convierte `suma.c` en el ejecutable.
@@ -274,7 +274,7 @@ gcc generaría un ejecutable llamado `a.out` por defecto.
 
 ```makefile
 clean:
-	# Escribí el comando aquí
+	rm -f $(PROGRAMA)
 ```
 
 Escribí el comando que elimina el ejecutable generado. Usá `rm -f $(PROGRAMA)`.
@@ -316,7 +316,7 @@ Abrí `ejercicio2/Makefile` y completá los tres TODOs.
 
 ```makefile
 $(PROGRAMA): scanner2.l
-	# TODO 1: flex ...
+	flex scanner2.l
 ```
 
 El primer paso es ejecutar Flex sobre el archivo `.l`. El comando es simplemente:
@@ -339,7 +339,7 @@ no hace nada.
 #### TODO 2 — Compilar el código generado por Flex
 
 ```makefile
-	# TODO 2: $(CC) ...
+	$(CC) lex.yy.c -o $(PROGRAMA)
 ```
 
 Una vez que Flex generó `lex.yy.c`, el segundo paso es compilarlo con gcc
@@ -356,7 +356,8 @@ intente compilar `lex.yy.c`, Flex ya lo habrá generado.
 
 ```makefile
 clean:
-	# TODO 3: rm -f ...
+	rm -f $(PROGRAMA)
+	rm -f lex.yy.c
 ```
 
 Ahora hay dos archivos generados que conviene limpiar: el ejecutable `$(PROGRAMA)`
@@ -404,7 +405,7 @@ Abrí `ejercicio3/Makefile` y completá los cuatro TODOs.
 
 ```makefile
 $(PROGRAMA): parser3.y scanner3.l
-	# TODO 1: bison ...
+	bison -d parser3.y
 ```
 
 El primer paso es procesar el archivo `.y` con Bison. El comando es:
@@ -427,7 +428,7 @@ definiciones. Si no usáramos `-d`, no existiría ese archivo y la compilación 
 #### TODO 2 — Invocar Flex
 
 ```makefile
-	# TODO 2: flex ...
+	flex scanner3.l
 ```
 
 El segundo paso es procesar `scanner3.l` con Flex para generar `lex.yy.c`.
@@ -440,7 +441,7 @@ eso este paso debe ir **después** del paso de Bison: cuando Flex procesa el
 #### TODO 3 — Compilar y linkear todo con gcc
 
 ```makefile
-	# TODO 3: $(CC) ...
+	$(CC) lex.yy.c parser3.tab.c -o $(PROGRAMA)
 ```
 
 Ahora tenemos dos archivos C generados: `lex.yy.c` (el scanner) y `parser3.tab.c`
@@ -459,7 +460,10 @@ lo cual veremos en el ejercicio 4.
 
 ```makefile
 clean:
-	# TODO 4: rm -f ...
+	rm -f $(PROGRAMA)
+	rm -f lex.yy.c
+	rm -f parser3.tab.c
+	rm -f parser3.tab.h
 ```
 
 Ahora Bison y Flex generaron cuatro archivos intermedios: `parser3.tab.c`,
@@ -504,7 +508,7 @@ Abrí `ejercicio4/Makefile` y completá los cinco TODOs.
 #### TODO 1 — Definir `SRCS`
 
 ```makefile
-SRCS :=
+SRCS := main.c operaciones.c
 ```
 
 `SRCS` (_sources_) es la variable que lista todos los archivos fuente `.c` del
@@ -518,7 +522,7 @@ agregamos un tercer archivo, solo necesitamos sumarlo aquí.
 #### TODO 2 — Derivar `OBJS` a partir de `SRCS`
 
 ```makefile
-OBJS :=
+OBJS := $(SRCS:.c=.o)
 ```
 
 `OBJS` (_objects_) debe contener la lista de archivos `.o` correspondientes
@@ -539,7 +543,8 @@ archivos, `OBJS` se actualiza automáticamente.
 
 ```makefile
 $(PROGRAMA): $(OBJS)
-	# Escribí el comando aquí
+	$(CC) $^ -o $(PROGRAMA)
+	$(CC) $(CFLAGS) -c $< -o $@
 ```
 
 Este target toma todos los archivos `.o` y los linkea en el ejecutable final.
@@ -559,7 +564,7 @@ modificarlo.
 #### TODO 4 — Regla de patrón para compilar `.c` → `.o`
 
 ```makefile
-# Escribí la regla de patrón aquí
+	rm -f $(PROGRAMA) $(OBJS)
 ```
 
 Esta es la regla más poderosa del ejercicio. En lugar de escribir una regla
@@ -584,7 +589,7 @@ Desglose del comando:
 #### TODO 5 — Declarar `.PHONY`
 
 ```makefile
-# Declarar targets que no son archivos
+	.PHONY: all clean
 ```
 
 Agregá la declaración `.PHONY` para los targets `all` y `clean`. Si existiera
@@ -625,7 +630,7 @@ ejecución y la otra, ¿qué hace Make en la segunda ejecución?
 Opciones: `RECOMPILA` / `NO_RECOMPILA` / `DA_ERROR`
 
 ```
-P1=???
+P1=NO_RECOMPILA
 ```
 
 ---
@@ -639,7 +644,7 @@ llamado `clean`?
 Opciones: `SI` / `NO`
 
 ```
-P2=???
+P2=NO
 ```
 
 ---
@@ -652,7 +657,7 @@ P2=???
 Opciones: `PARA_CREAR_ARCHIVOS` / `PARA_EVITAR_CONFLICTOS_DE_NOMBRES` / `PARA_COMPILAR_MAS_RAPIDO`
 
 ```
-P3=???
+P3=PARA_EVITAR_CONFLICTOS_DE_NOMBRES
 ```
 
 ---
@@ -661,10 +666,10 @@ P3=???
 
 ### Checklist
 
-- [ ] Todos los `TODO` completados en los archivos `Makefile`
-- [ ] Preguntas P1, P2 y P3 respondidas en este `README.md`
-- [ ] `make test` pasa localmente
-- [ ] Todo pusheado a `main`
+- [X] Todos los `TODO` completados en los archivos `Makefile`
+- [X] Preguntas P1, P2 y P3 respondidas en este `README.md`
+- [X] `make test` pasa localmente
+- [X] Todo pusheado a `main`
 
 ### Verificación local
 
